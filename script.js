@@ -62,40 +62,23 @@ async function handleFiles(files) {
         if (!validExtensions.includes(fileExtension) || file.size > maxSizeInBytes) {
             showErrorMessage(file, validExtensions, maxSizeInBytes);
         } else {
-            if (!ffmpeg.isLoaded()) {
-                await ffmpeg.load();
-            }
-            ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
-            try {
-                await ffmpeg.run('-i', 'input.mp4');
-                const codecInfo = ffmpeg.FS('readFile', 'input.mp4').toString();
-                if (codecInfo.includes('Video: av1')) {
-                    showErrorMessage(file, validExtensions, maxSizeInBytes, 'AV1 codec is not supported.');
-                } else {
-                    displayFileName(file.name);
-                    settingsDiv.style.display = 'block';
-                    compressButton.onclick = () => compressFile(file);
-                }
-            } catch (error) {
-                console.error('Error during FFmpeg processing:', error);
-                showErrorMessage(file, validExtensions, maxSizeInBytes, 'Error processing file.');
-            }
+            displayFileName(file.name);
+            settingsDiv.style.display = 'block';
+            compressButton.onclick = () => compressFile(file);
         }
     }
 }
 
-function showErrorMessage(file, validExtensions, maxSizeInBytes, customMessage = '') {
+function showErrorMessage(file, validExtensions, maxSizeInBytes) {
     const fileExtension = file.name.split('.').pop().toLowerCase();
     const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
     const maxSizeInMB = maxSizeInBytes / (1024 * 1024);
 
-    let errorMessage = customMessage;
-    if (!errorMessage) {
-        if (!validExtensions.includes(fileExtension)) {
-            errorMessage = `Invalid file type. Please upload a video file.`;
-        } else if (file.size > maxSizeInBytes) {
-            errorMessage = `File size (${fileSizeInMB} MB) exceeds the maximum limit of 2 GB.`;
-        }
+    let errorMessage = '';
+    if (!validExtensions.includes(fileExtension)) {
+        errorMessage = `Invalid file type. Please upload a video file.`;
+    } else if (file.size > maxSizeInBytes) {
+        errorMessage = `File size (${fileSizeInMB} MB) exceeds the maximum limit of 2 GB.`;
     }
 
     document.getElementById('error-message').textContent = errorMessage;
@@ -132,9 +115,16 @@ async function compressFile(file) {
     const quality = parseFloat(qualitySlider.value);
     const crf = calculateCRF(quality);
     try {
+        // Check the codec of the input file
+        const codecCheckResult = await ffmpeg.run('-i', 'input.mp4');
+        const isAV1 = codecCheckResult.includes('Video: av1');
+
+        // Set the codec based on the input file's codec
+        const codec = isAV1 ? 'libaom-av1' : 'libx264';
+
         await ffmpeg.run(
             '-i', 'input.mp4',
-            '-vcodec', 'libx264',
+            '-vcodec', codec,
             '-crf', crf.toString(),
             '-preset', 'superfast',
             '-movflags', 'faststart',
