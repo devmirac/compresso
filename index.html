@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Compressor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.0/dist/ffmpeg.min.js"></script>
+</head>
+<body>
+    <div id="drop-area">
+        <div id="drop-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5L12 15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M7 10L12 5L17 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6 19L18 19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <h2>Drag & drop or select a video</h2>
+        <p>Compression happens on your device without any data sent to our servers</p>
+        <button id="select-file">Select File</button>
+        <div id="file-name"></div>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="settings" style="display: none;">
+            <div class="slider-container">
+                <span class="slider-label">Least Size</span>
+                <input type="range" id="quality-slider" min="0" max="100" value="50" step="12.5">
+                <span class="slider-label">Best Quality</span>
+            </div>
+            <button id="compress-button">Compress</button>
+        </div>
+        <div id="size-display" style="display: none;">
+            <div class="size-container">
+                <div class="size-box">
+                    <div>
+                        <div class="size-label">Before</div>
+                        <div class="size-value" id="original-size"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="size-container">
+                <div class="size-box">
+                    <div id="after-compression">
+                        <div class="size-label">After</div>
+                        <div class="size-value" id="compressed-size"></div>
+                        <div class="size-reduction" id="size-reduction"></div>
+                    </div>
+                    <div id="compression-loader" class="loader"></div>
+                    <div id="error-message" class="error-message" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="button-container" style="display: none;">
+                <button id="new-file-button">New File</button>
+                <button class="download-button" id="download-button">Download</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
