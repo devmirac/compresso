@@ -91,7 +91,6 @@ function calculateCRF(quality) {
     return Math.round(30 - (quality / 100) * 7);
 }
 
-
 function displayFileName(fileName) {
     fileNameDisplay.textContent = fileName;
     fileNameDisplay.style.display = 'block';
@@ -139,12 +138,27 @@ async function compressFile(file) {
         if (compressedSize === '0.0 MB') {
             compressedSize = 'Error';
         }
-        if (compressedSize !== 'Error') {       
-            var reductionPercentage = ((1 - (data.buffer.byteLength / file.size)) * 100).toFixed(1) + '% Smaller';
-        }
         document.getElementById('compressed-size').textContent = compressedSize;
+
         if (compressedSize !== 'Error') {
-            document.getElementById('size-reduction').textContent = reductionPercentage;
+            var sizeRatio = data.buffer.byteLength / file.size;
+            var percentageChange = ((1 - sizeRatio) * 100).toFixed(1);
+            var sizeChangeText = '';
+            var sizeChangeColor = '';
+
+            if (sizeRatio < 1) {
+                sizeChangeText = percentageChange + '% Smaller';
+                sizeChangeColor = '#4CAF50'; // Green
+            } else if (sizeRatio > 1) {
+                sizeChangeText = Math.abs(percentageChange) + '% Larger';
+                sizeChangeColor = '#FFA500'; // Orange
+            } else {
+                sizeChangeText = 'No Change';
+                sizeChangeColor = '#FFFFFF'; // White
+            }
+
+            document.getElementById('size-reduction').textContent = sizeChangeText;
+            document.getElementById('size-reduction').style.backgroundColor = sizeChangeColor;
         } else {
             document.getElementById('size-reduction').style.display = 'none';
             document.getElementById('download-button').style.display = 'none';
@@ -171,7 +185,6 @@ async function compressFile(file) {
         //document.getElementById('size-reduction').textContent = '0.0% Smaller';
     }
 }
-
 
 selectFileButton.addEventListener('click', () => {
     const input = document.createElement('input');
