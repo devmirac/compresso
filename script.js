@@ -114,14 +114,17 @@ async function compressFile(file) {
     ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
     const quality = parseFloat(qualitySlider.value);
     const crf = calculateCRF(quality);
+    const codec = 'libx264';
     try {
-        // Check the codec of the input file
-        const codecCheckResult = await ffmpeg.run('-i', 'input.mp4');
-        const isAV1 = codecCheckResult.includes('Video: av1');
-
-        // Set the codec based on the input file's codec
-        const codec = isAV1 ? 'libaom-av1' : 'libx264';
-
+        //let codecCheckResult = '';
+        //ffmpeg.setLogger(({ type, message }) => {
+        //    if (type === 'fferr' && message.includes('Video:')) {
+        //        codecCheckResult += message;
+        //    }
+        //});
+        //await ffmpeg.run('-i', 'input.mp4');
+        //const isAV1 = codecCheckResult.includes('Video: av1');
+        //const codec = isAV1 ? 'libaom-av1' : 'libx264';
         await ffmpeg.run(
             '-i', 'input.mp4',
             '-vcodec', codec,
@@ -132,10 +135,20 @@ async function compressFile(file) {
         );
         const data = ffmpeg.FS('readFile', 'output.mp4');
         const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-        const compressedSize = (data.buffer.byteLength / (1024 * 1024)).toFixed(1) + ' MB';
-        const reductionPercentage = ((1 - (data.buffer.byteLength / file.size)) * 100).toFixed(1) + '% Smaller';
+        var compressedSize = (data.buffer.byteLength / (1024 * 1024)).toFixed(1) + ' MB';
+        if (compressedSize === '0.0 MB') {
+            compressedSize = 'Error';
+        }
+        if (compressedSize !== 'Error') {       
+            var reductionPercentage = ((1 - (data.buffer.byteLength / file.size)) * 100).toFixed(1) + '% Smaller';
+        }
         document.getElementById('compressed-size').textContent = compressedSize;
-        document.getElementById('size-reduction').textContent = reductionPercentage;
+        if (compressedSize !== 'Error') {
+            document.getElementById('size-reduction').textContent = reductionPercentage;
+        } else {
+            document.getElementById('size-reduction').style.display = 'none';
+            document.getElementById('download-button').style.display = 'none';
+        }
         document.getElementById('compression-loader').style.display = 'none';
         document.getElementById('after-compression').style.display = 'block';
         document.querySelector('.button-container').style.display = 'flex';
@@ -154,8 +167,8 @@ async function compressFile(file) {
         console.error('Error during FFmpeg processing:', error);
         document.getElementById('compression-loader').style.display = 'none';
         document.getElementById('after-compression').style.display = 'block';
-        document.getElementById('compressed-size').textContent = '0.0 MB';
-        document.getElementById('size-reduction').textContent = '0.0% Smaller';
+        document.getElementById('compressed-size').textContent = 'Error';
+        //document.getElementById('size-reduction').textContent = '0.0% Smaller';
     }
 }
 
