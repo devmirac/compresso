@@ -7,6 +7,29 @@ const ffmpeg = createFFmpeg({
     },
 });
 
+function isMobileBrowser() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function showMobileWarning() {
+    document.body.innerHTML = '<div id="mobile-warning">This app is not optimized for mobile devices. Please use a desktop browser for the best experience.</div>';
+}
+
+if (isMobileBrowser()) {
+    showMobileWarning();
+} else {
+    const dropArea = document.getElementById('drop-area');
+    const selectFileButton = document.getElementById('select-file');
+    const fileNameDisplay = document.getElementById('file-name');
+    const settingsDiv = document.getElementById('settings');
+    const qualitySlider = document.getElementById('quality-slider');
+    const compressButton = document.getElementById('compress-button');
+    const editFpsCheckbox = document.getElementById('edit-fps');
+    const fpsOptions = document.getElementById('fps-options');
+    const fpsRadios = document.getElementsByName('fps');
+    const audioRadios = document.getElementsByName('audio');
+}
+
 const dropArea = document.getElementById('drop-area');
 const selectFileButton = document.getElementById('select-file');
 const fileNameDisplay = document.getElementById('file-name');
