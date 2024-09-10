@@ -24,9 +24,39 @@
         <div id="error-message" class="error-message" style="display: none;"></div>
         <div id="settings" style="display: none;">
             <div class="slider-container">
-                <span class="slider-label">Least Size</span>
-                <input type="range" id="quality-slider" min="0" max="100" value="50" step="12.5">
                 <span class="slider-label">Best Quality</span>
+                <input type="range" id="quality-slider" min="0" max="100" value="50" step="12.5">
+                <span class="slider-label">Least Size</span>
+            </div>
+            <div class="settings-group">
+                <div class="settings-row">
+                    <span class="settings-label">FPS</span>
+                    <div id="fps-options">
+                        <input type="radio" id="keep-fps" name="fps" value="keep" checked>
+                        <label for="keep-fps">Current</label>
+                        <input type="radio" id="fps-60" name="fps" value="60">
+                        <label for="fps-60">60</label>
+                        <input type="radio" id="fps-30" name="fps" value="30">
+                        <label for="fps-30">30</label>
+                        <input type="radio" id="fps-16" name="fps" value="16">
+                        <label for="fps-16">16</label>
+                        <input type="radio" id="fps-8" name="fps" value="8">
+                        <label for="fps-8">8</label>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-row">
+                    <span class="settings-label">Audio</span>
+                    <div id="audio-options">
+                        <input type="radio" id="current-audio" name="audio" value="current" checked>
+                        <label for="current-audio">Keep</label>
+                        <input type="radio" id="optimize-audio" name="audio" value="optimize">
+                        <label for="optimize-audio">Optimize</label>
+                        <input type="radio" id="remove-audio" name="audio" value="remove">
+                        <label for="remove-audio">Remove</label>
+                    </div>
+                </div>
             </div>
             <button id="compress-button">Compress</button>
         </div>

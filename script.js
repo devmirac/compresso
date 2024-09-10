@@ -13,6 +13,10 @@ const fileNameDisplay = document.getElementById('file-name');
 const settingsDiv = document.getElementById('settings');
 const qualitySlider = document.getElementById('quality-slider');
 const compressButton = document.getElementById('compress-button');
+const editFpsCheckbox = document.getElementById('edit-fps');
+const fpsOptions = document.getElementById('fps-options');
+const fpsRadios = document.getElementsByName('fps');
+const audioRadios = document.getElementsByName('audio');
 
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropArea.addEventListener(eventName, preventDefaults, false);
@@ -88,7 +92,7 @@ function showErrorMessage(file, validExtensions, maxSizeInBytes) {
 }
 
 function calculateCRF(quality) {
-    return Math.round(30 - (quality / 100) * 7);
+    return Math.round(23 + (quality / 100) * 7);
 }
 
 function displayFileName(fileName) {
@@ -113,34 +117,42 @@ async function compressFile(file) {
     ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
     const quality = parseFloat(qualitySlider.value);
     const crf = calculateCRF(quality);
-    const codec = 'libx264';
+    const selectedFps = Array.from(fpsRadios).find(radio => radio.checked)?.value;
+    const selectedAudio = Array.from(audioRadios).find(radio => radio.checked)?.value;
+    
     try {
-        //let codecCheckResult = '';
-        //ffmpeg.setLogger(({ type, message }) => {
-        //    if (type === 'fferr' && message.includes('Video:')) {
-        //        codecCheckResult += message;
-        //    }
-        //});
-        //await ffmpeg.run('-i', 'input.mp4');
-        //const isAV1 = codecCheckResult.includes('Video: av1');
-        //const codec = isAV1 ? 'libaom-av1' : 'libx264';
-        await ffmpeg.run(
+        const args = [
             '-i', 'input.mp4',
-            '-vcodec', codec,
+            '-vcodec', 'libx264',
             '-crf', crf.toString(),
             '-preset', 'superfast',
-            '-movflags', 'faststart',
-            'output.mp4'
-        );
+            '-movflags', 'faststart'
+        ];
+        if (selectedFps && selectedFps !== 'keep') {
+            args.push('-r', selectedFps);
+        }
+        if (selectedAudio === 'optimize') {
+            args.push('-c:a', 'aac');
+            args.push('-b:a', '128k');
+        } else if (selectedAudio === 'remove') {
+            args.push('-an');
+        } else if (selectedAudio === 'current') {
+            args.push('-c:a', 'copy');
+        }
+        
+        args.push('output.mp4');
+        await ffmpeg.run(...args);
         const data = ffmpeg.FS('readFile', 'output.mp4');
         const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
         var compressedSize = (data.buffer.byteLength / (1024 * 1024)).toFixed(1) + ' MB';
+        var error = false;
         if (compressedSize === '0.0 MB') {
-            compressedSize = 'Error';
+            compressedSize = 'This codec is not supported at the moment';
+            error = true;
         }
         document.getElementById('compressed-size').textContent = compressedSize;
 
-        if (compressedSize !== 'Error') {
+        if (!error) {
             var sizeRatio = data.buffer.byteLength / file.size;
             var percentageChange = ((1 - sizeRatio) * 100).toFixed(1);
             var sizeChangeText = '';
@@ -182,7 +194,6 @@ async function compressFile(file) {
         document.getElementById('compression-loader').style.display = 'none';
         document.getElementById('after-compression').style.display = 'block';
         document.getElementById('compressed-size').textContent = 'Error';
-        //document.getElementById('size-reduction').textContent = '0.0% Smaller';
     }
 }
 

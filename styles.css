@@ -322,3 +322,63 @@ footer p {
 footer a:hover .github-icon {
     fill: #4CAF50;
 }
+
+.settings-group {
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-label {
+    font-size: 12px;
+    color: #a0a0a0;
+    margin-right: -28px;
+    width: 40px;
+    text-align: right;
+}
+
+#fps-options,
+#audio-options {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+#fps-options input[type="radio"],
+#audio-options input[type="radio"] {
+    display: none;
+}
+
+#fps-options label,
+#audio-options label {
+    font-size: 12px;
+    color: #a0a0a0;
+    background-color: #3a3a3a;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+    margin-right: 5px;
+}
+
+#fps-options input[type="radio"]:checked + label {
+    background-color: #2fc2ba;
+    color: #ffffff;
+}
+
+#audio-options input[type="radio"]:checked + label {
+    background-color: #FFA500;
+    color: #ffffff;
+}
+
+#fps-options label:hover,
+#audio-options label:hover {
+    background-color: #4a4a4a;
+    color: #ffffff;
+}
