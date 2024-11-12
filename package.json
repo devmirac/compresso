@@ -1,12 +1,8 @@
 {
-  "name": "video-compressor",
-  "version": "1.0.0",
-  "description": "Video compression web app",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
-    "express": "^4.17.1"
-  }
+    "@ffmpeg/ffmpeg": "^0.12.7",
+    "@ffmpeg/util": "^0.12.1",
+    "express": "^4.21.1"
+  },
+  "type": "module"
 }
